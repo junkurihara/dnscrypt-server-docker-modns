@@ -37,10 +37,16 @@ ENV RUSTFLAGS "-C link-arg=-s"
 RUN apt-get update && apt-get install -qy --no-install-recommends $BUILD_DEPS && \
     curl -sSf https://sh.rustup.rs | bash -s -- -y --default-toolchain stable && \
     export PATH="$HOME/.cargo/bin:$PATH" && \
-    echo "Compiling encrypted-dns version 0.3.21" && \
-    cargo install encrypted-dns && \
+    # echo "Compiling encrypted-dns version 0.3.21" && \
+    echo "Building encrypted-dns from source" && \
+    git clone https://github.com/junkurihara/encrypted-dns-server && \
+    git checkout logging && \
+    cd encrypted-dns-server && \
+    cargo build --release && \
+    # cargo install encrypted-dns && \
     mkdir -p /opt/encrypted-dns/sbin && \
-    mv ~/.cargo/bin/encrypted-dns /opt/encrypted-dns/sbin/ && \
+    #mv ~/.cargo/bin/encrypted-dns /opt/encrypted-dns/sbin/ && \
+    mv ./encrypted-dns-server/target/release/encrypted-dns /opt/encrypted-dns/sbin/ && \
     strip --strip-all /opt/encrypted-dns/sbin/encrypted-dns && \
     apt-get -qy purge $BUILD_DEPS && apt-get -qy autoremove && \
     rm -fr ~/.cargo ~/.rustup && \
