@@ -47,13 +47,13 @@ RUN apt-get update && apt-get install -qy --no-install-recommends $BUILD_DEPS &&
     git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/junkurihara/encrypted-dns-server-fork encrypted-dns-server && \
     cd encrypted-dns-server && \
     git checkout pealing_header && \
-    cargo build&& \
+    cargo build --release && \
     # echo "Compiling encrypted-dns version 0.3.23" && \
     # cargo install encrypted-dns && \
     mkdir -p /opt/encrypted-dns/sbin && \
-    mv /tmp/encrypted-dns-server/target/debug/encrypted-dns ~/.cargo/bin/encrypted-dns && \
+    mv /tmp/encrypted-dns-server/target/release/encrypted-dns ~/.cargo/bin/encrypted-dns && \
     mv ~/.cargo/bin/encrypted-dns /opt/encrypted-dns/sbin/ && \
-    # strip --strip-all /opt/encrypted-dns/sbin/encrypted-dns && \
+    strip --strip-all /opt/encrypted-dns/sbin/encrypted-dns && \
     apt-get -qy purge $BUILD_DEPS && apt-get -qy autoremove && \
     rm -fr ~/.cargo ~/.rustup && \
     rm -fr /tmp/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/* /var/log/apt/* /var/log/*.log
