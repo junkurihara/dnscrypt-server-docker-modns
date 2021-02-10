@@ -237,7 +237,7 @@ allow_non_reserved_ports = false
 blacklisted_ips = [ @ANONDNS_BLACKLISTED_IPS@ ]
 
 # [FORK!] maximum allowed subsequent relays
-max_subsequent_relays = 3
+max_subsequent_relays = 2
 
 
 ################################
