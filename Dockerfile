@@ -14,7 +14,7 @@ RUN apt-get update; apt-get -qy dist-upgrade; apt-get -qy clean && \
 RUN update-ca-certificates 2> /dev/null || true
 
 ENV UNBOUND_GIT_URL https://github.com/NLnetLabs/unbound.git
-ENV UNBOUND_GIT_REVISION 9eeb95a960460399d66f13fca02fb50464c50e10
+ENV UNBOUND_GIT_REVISION e0d426ebb10653a78bf5c4053198f6ac19bfcd3e
 
 WORKDIR /tmp
 
@@ -37,13 +37,13 @@ ENV RUSTFLAGS "-C link-arg=-s"
 RUN apt-get update && apt-get install -qy --no-install-recommends $BUILD_DEPS && \
     curl -sSf https://sh.rustup.rs | bash -s -- -y --default-toolchain stable && \
     export PATH="$HOME/.cargo/bin:$PATH" && \
-    # echo "Compiling encrypted-dns version 0.3.21" && \
-    # cargo install encrypted-dns && \
     echo "Building encrypted-dns from source" && \
-    git clone https://github.com/junkurihara/encrypted-dns-server && \
+    git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/junkurihara/encrypted-dns-server-fork && \
     cd encrypted-dns-server && \
     git checkout logging && \
     cargo build --release && \
+    # echo "Compiling encrypted-dns version 0.3.23" && \
+    # cargo install encrypted-dns && \
     mkdir -p /opt/encrypted-dns/sbin && \
     mv /tmp/encrypted-dns-server/target/release/encrypted-dns ~/.cargo/bin/encrypted-dns && \
     mv ~/.cargo/bin/encrypted-dns /opt/encrypted-dns/sbin/ && \
