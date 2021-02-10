@@ -1,0 +1,6 @@
+data/
+kube/
+.vscode/
+*.png
+*.md
+log/

@@ -1,0 +1,27 @@
+version: "3"
+services:
+  dnscrypt-server:
+    image: jqtype/dnscrypt-server
+    container_name: dnscrypt-server
+    ulimits:
+      nofile:
+        soft: 90000
+        hard: 90000
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - ${PORT}:${PORT}/udp
+      - ${PORT}:${PORT}/tcp
+    command: init -A -N ${DOMAIN_NAME} -E '${IPV4_ADDR}:${PORT},[${IPV6_ADDR}]:${PORT}' -M 0.0.0.0:9100
+    volumes:
+      - ./data/keys:/opt/encrypted-dns/etc/keys
+      - ./data/lists:/opt/encrypted-dns/etc/lists
+      - ./log/dnscrypt-server:/var/log/dnscrypt-server
+    # network_mode: "host"
+
+  watchtower:
+    image: v2tec/watchtower
+    container_name: watchtower
+    command: dnscrypt-server --interval 30
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

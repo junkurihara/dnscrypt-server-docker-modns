@@ -1,5 +1,10 @@
 FROM ubuntu:20.10
 LABEL maintainer="Frank Denis"
+LABEL maintainer="JK"
+
+ARG GIT_USER
+ARG GIT_TOKEN
+
 SHELL ["/bin/sh", "-x", "-c"]
 ENV SERIAL 1
 
@@ -38,16 +43,16 @@ RUN apt-get update && apt-get install -qy --no-install-recommends $BUILD_DEPS &&
     curl -sSf https://sh.rustup.rs | bash -s -- -y --default-toolchain stable && \
     export PATH="$HOME/.cargo/bin:$PATH" && \
     echo "Building encrypted-dns from source" && \
-    git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/junkurihara/encrypted-dns-server-fork && \
+    git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/junkurihara/encrypted-dns-server-fork encrypted-dns-server && \
     cd encrypted-dns-server && \
-    git checkout logging && \
-    cargo build --release && \
+    git checkout pealing_header && \
+    cargo build&& \
     # echo "Compiling encrypted-dns version 0.3.23" && \
     # cargo install encrypted-dns && \
     mkdir -p /opt/encrypted-dns/sbin && \
-    mv /tmp/encrypted-dns-server/target/release/encrypted-dns ~/.cargo/bin/encrypted-dns && \
+    mv /tmp/encrypted-dns-server/target/debug/encrypted-dns ~/.cargo/bin/encrypted-dns && \
     mv ~/.cargo/bin/encrypted-dns /opt/encrypted-dns/sbin/ && \
-    strip --strip-all /opt/encrypted-dns/sbin/encrypted-dns && \
+    # strip --strip-all /opt/encrypted-dns/sbin/encrypted-dns && \
     apt-get -qy purge $BUILD_DEPS && apt-get -qy autoremove && \
     rm -fr ~/.cargo ~/.rustup && \
     rm -fr /tmp/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/* /var/log/apt/* /var/log/*.log
@@ -68,6 +73,7 @@ RUN mkdir -p \
 
 COPY encrypted-dns.toml.in /opt/encrypted-dns/etc/
 COPY undelegated.txt /opt/encrypted-dns/etc/
+COPY .env /opt/encrypted-dns/etc/
 
 COPY entrypoint.sh /
 
