@@ -14,6 +14,7 @@ services:
       - ${PORT}:${PORT}/tcp
     command: init -A -N ${DOMAIN_NAME} -E '${IPV4_ADDR}:${PORT},[${IPV6_ADDR}]:${PORT}' -M 0.0.0.0:9100
     volumes:
+      - ./.env:/opt/encrypted-dns/etc/.env
       - ./data/keys:/opt/encrypted-dns/etc/keys
       - ./data/lists:/opt/encrypted-dns/etc/lists
       - ./log/dnscrypt-server:/var/log/dnscrypt-server

@@ -4,6 +4,7 @@ LABEL maintainer="JK"
 
 ARG GIT_USER
 ARG GIT_TOKEN
+ARG DEBUG
 
 SHELL ["/bin/sh", "-x", "-c"]
 ENV SERIAL 1
@@ -73,7 +74,6 @@ RUN mkdir -p \
 
 COPY encrypted-dns.toml.in /opt/encrypted-dns/etc/
 COPY undelegated.txt /opt/encrypted-dns/etc/
-COPY .env /opt/encrypted-dns/etc/
 
 COPY entrypoint.sh /
 

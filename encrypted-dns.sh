@@ -11,7 +11,11 @@ fi
 
 chown -R _encrypted-dns:_encrypted-dns /opt/dnscrypt-wrapper/etc/keys 2>/dev/null || :
 chown -R _encrypted-dns:_encrypted-dns /opt/encrypted-dns/etc/keys 2>/dev/null || :
-source /opt/encrypted-dns/etc/.env
+
+if [ -f /opt/encrypted-dns/etc/.env ]; then
+  source /opt/encrypted-dns/etc/.env
+fi
+
 if [ $DEBUG ]; then
   RUST_LOG=debug exec /opt/encrypted-dns/sbin/encrypted-dns --config "$CONFIG_FILE" | tee $LOG_FILE
 else
