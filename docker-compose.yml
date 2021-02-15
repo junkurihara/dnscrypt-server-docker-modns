@@ -3,6 +3,11 @@ services:
   dnscrypt-server:
     image: jqtype/dnscrypt-server
     container_name: dnscrypt-server
+    build:
+      context: ./
+      args:
+        - GIT_USER=${GIT_USER}
+        - GIT_TOKEN=${GIT_TOKEN}
     ulimits:
       nofile:
         soft: 90000
