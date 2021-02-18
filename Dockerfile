@@ -7,7 +7,7 @@ ARG GIT_TOKEN
 ARG DEBUG
 
 SHELL ["/bin/sh", "-x", "-c"]
-ENV SERIAL 1
+ENV SERIAL 2
 
 ENV CFLAGS=-Ofast
 ENV BUILD_DEPS   curl make build-essential git libevent-dev libexpat1-dev autoconf file libssl-dev byacc
@@ -20,7 +20,7 @@ RUN apt-get update; apt-get -qy dist-upgrade; apt-get -qy clean && \
 RUN update-ca-certificates 2> /dev/null || true
 
 ENV UNBOUND_GIT_URL https://github.com/NLnetLabs/unbound.git
-ENV UNBOUND_GIT_REVISION e0d426ebb10653a78bf5c4053198f6ac19bfcd3e
+ENV UNBOUND_GIT_REVISION 74e06cc4b3fbe3dcea08eb93fcfca8f4359a9fb5
 
 WORKDIR /tmp
 
