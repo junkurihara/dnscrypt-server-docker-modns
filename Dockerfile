@@ -46,7 +46,7 @@ RUN apt-get update && apt-get install -qy --no-install-recommends $BUILD_DEPS &&
     echo "Building encrypted-dns from source" && \
     git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/junkurihara/encrypted-dns-server-fork encrypted-dns-server && \
     cd encrypted-dns-server && \
-    git checkout pealing_header && \
+    git checkout peeling_header && \
     cargo build --release && \
     # echo "Compiling encrypted-dns version 0.3.23" && \
     # cargo install encrypted-dns && \
