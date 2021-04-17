@@ -44,7 +44,7 @@ networks:
     external: true
   net-modns:
     name: net-modns
-    internal: true
+    #internal: true
     driver: bridge
     ipam:
       driver: default
