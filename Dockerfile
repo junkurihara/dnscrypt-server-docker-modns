@@ -7,25 +7,24 @@ ARG GIT_TOKEN
 ARG DEBUG
 
 SHELL ["/bin/sh", "-x", "-c"]
-ENV SERIAL 3
+ENV SERIAL 4
 
 ENV CFLAGS=-Ofast
 ENV BUILD_DEPS   curl make build-essential git libevent-dev libexpat1-dev autoconf file libssl-dev byacc
 ENV RUNTIME_DEPS bash util-linux coreutils findutils grep libssl1.1 ldnsutils libevent-2.1-7 expat ca-certificates runit runit-helper jed logrotate
 
-RUN apt update; apt -qy dist-upgrade; apt -qy clean && \
+RUN apt update && apt -qy dist-upgrade && apt -qy clean && \
     apt install -qy --no-install-recommends $RUNTIME_DEPS && \
     rm -fr /tmp/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/* /var/log/apt/* /var/log/*.log
 
 RUN update-ca-certificates 2> /dev/null || true
 
 ENV UNBOUND_GIT_URL https://github.com/NLnetLabs/unbound.git
-#ENV UNBOUND_GIT_REVISION 74e06cc4b3fbe3dcea08eb93fcfca8f4359a9fb5
-ENV UNBOUND_GIT_REVISION 7226d2f9f24f2047357a192ebb7be9754357fe93
+ENV UNBOUND_GIT_REVISION ea4f1ee8a68cfdbaaeb110990e59cd976bd1ce5d
 
 WORKDIR /tmp
 
-RUN apt update; apt install -qy --no-install-recommends $BUILD_DEPS && \
+RUN apt update && apt install -qy --no-install-recommends $BUILD_DEPS && \
     git clone --depth=1000 "$UNBOUND_GIT_URL" && \
     cd unbound && \
     git checkout "$UNBOUND_GIT_REVISION" && \
