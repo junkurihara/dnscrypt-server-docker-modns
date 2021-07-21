@@ -2,8 +2,6 @@ FROM ubuntu:21.04
 LABEL maintainer="Frank Denis"
 LABEL maintainer="JK"
 
-ARG GIT_USER
-ARG GIT_TOKEN
 ARG DEBUG
 
 SHELL ["/bin/sh", "-x", "-c"]
@@ -44,7 +42,7 @@ RUN apt update && apt install -qy --no-install-recommends $BUILD_DEPS && \
     curl -sSf https://sh.rustup.rs | bash -s -- -y --default-toolchain stable && \
     export PATH="$HOME/.cargo/bin:$PATH" && \
     echo "Building encrypted-dns from source" && \
-    git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/junkurihara/encrypted-dns-server-modns encrypted-dns-server && \
+    git clone https://github.com/junkurihara/encrypted-dns-server-modns encrypted-dns-server && \
     cd encrypted-dns-server && \
     git checkout peeling_header && \
     cargo build --release && \

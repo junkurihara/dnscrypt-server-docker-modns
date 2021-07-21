@@ -1,3 +1,95 @@
+This repo is a forked version of [`dnscrypt-server-docker`](https://github.com/DNSCrypt/dnscrypt-server-docker). From the original version, this has been modified to employ a PoC implementation of **&mu;ODNS** that is a **multiple-relay-based anonymization protocol for DNS queries**.
+
+&mu;ODNS has been designed to protect user privacy in DNS even if a relay(s) collude with a resolver(s), which cannot be solved in existing DNS anonymization protocols. For the detailed information of &mu;ODNS, please refer to our concept paper below:
+
+> Jun Kurihara and Takeshi Kubo, ''Mutualized oblivious DNS (&mu;ODNS): Hiding a tree in the wild forest,'' Apr. 2021. [https://arxiv.org/abs/2104.13785](https://arxiv.org/abs/2104.13785)
+
+Our PoC &mu;ODNS relays have been implemented as a fork of [`encrypted-dns-server`](https://github.com/jedisct1/encrypted-dns-server) and are available at [https://github.com/junkurihara/encrypted-dns-server-modns](https://github.com/junkurihara/encrypted-dns-server-modns). Publicly available relays for PoC &mu;ODNS are listed at [https://github.com/junkurihara/experimental-resolvers](https://github.com/junkurihara/experimental-resolvers).
+
+Docker image of `dnscrypt-server-modns` is available at [DockerHub](https://hub.docker.com/r/jqtype/dnscrypt-server-modns), which is integrated with the internal `Unbound` full-service resolver. A vanilla docker image of only `encrypted-dns-server-modns` is also given [here](https://hub.docker.com/r/jqtype/encrypted-dns-server-modns).
+
+> **NOTE**: **At this time this solution should be considered suitable for research and experimentation.**
+
+---
+
+## Configuration
+
+Unlike the original `dnscrypt-server-docker`, configuration of `.env` and `docker-compose.yml` is needed for easy deployment.
+
+```:.env
+# your server name
+DOMAIN_NAME=xxxxxx.com
+
+# exposed addresses reachable from the Internet.
+IPV4_ADDR=xxxxx
+IPV6_ADDR=xxxxxx
+
+# exposed port to the Internet
+PORT=50443
+
+# If Debug=true, then you can see debug messages in the log file.
+DEBUG=true
+
+# Log rotation setting for log file.
+LOGROTATE_SIZE=10M
+LOGROTATE_NUM=10
+```
+
+```:docker-compose.yml
+version: "3"
+services:
+  dnscrypt-server:
+    image: jqtype/dnscrypt-server-modns:latest
+    container_name: dnscrypt-server
+    ## Comment out the following two lines if you build this image yourself.
+    # build:
+    #   context: ./
+    ulimits:
+      nofile:
+        soft: 90000
+        hard: 90000
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - ${PORT}:${PORT}/udp
+      - ${PORT}:${PORT}/tcp
+    expose:
+      - 9100 # for prometheus server working in same docker internal network
+      - 553  # expose unbound port
+    command: init -A -N ${DOMAIN_NAME} -E '${IPV4_ADDR}:${PORT},[${IPV6_ADDR}]:${PORT}' -M 0.0.0.0:9100
+    # make sure that ./data and ./log have been created.
+    volumes:
+      - ./.env:/opt/encrypted-dns/etc/.env
+      - ./data/keys:/opt/encrypted-dns/etc/keys
+      - ./data/lists:/opt/encrypted-dns/etc/lists
+      - ./log/dnscrypt-server:/var/log/dnscrypt-server
+    # network_mode: "host"
+    networks:
+      net-modns:
+
+networks:
+  net-modns:
+    name: net-modns
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.53.0/24 # change as you like
+
+```
+
+If you want to configure the setting of `encrypted-dns-server-modns`, it should be done directly by modifying `./encrypted-dns.toml.in` and then build your own image! The configuration is given [here](https://github.com/junkurihara/encrypted-dns-server-modns).
+
+NOTE: IPv6 may not work due to Docker environment. (`network_mode=host` maybe required.)
+
+**If you deploy your own &mu;ODNS relay, please make a PR to the [PoC &mu;ODNS relay list](https://github.com/junkurihara/experimental-resolvers)!**
+
+---
+
+Below is the original README.md.
+
+---
+
 [![Gitter chat](https://badges.gitter.im/gitter.svg)](https://gitter.im/dnscrypt-operators/Lobby)
 [![DNSCrypt](https://raw.github.com/jedisct1/dnscrypt-server-docker/master/dnscrypt-small.png)](https://dnscrypt.info)
 
@@ -68,7 +160,7 @@ port `443`, the server can transparently relay non-DNS traffic to it (see below)
 
 `-v /etc/dnscrypt-server:/opt/encrypted-dns/etc/keys` means that the path `/opt/encrypted-dns/etc/keys`, internal to the container, is mapped to `/etc/dnscrypt-server/keys`, the directory we just created before. Do not change `/opt/encrypted-dns/etc/keys`. But if you created a directory in a different location, replace `/etc/dnscrypt-server/keys` accordingly in the command above.
 
-__Note:__ on MacOS, don't use `-v ...:...`. Remove that part from the command-line, as current versions of MacOS and Docker don't seem to work well with shared directories.
+**Note:** on MacOS, don't use `-v ...:...`. Remove that part from the command-line, as current versions of MacOS and Docker don't seem to work well with shared directories.
 
 The `init` command will print the DNS stamp of your server.
 
@@ -202,7 +294,7 @@ in minutes.
 
 - Create a static IP on GCE. This will be used for the LoadBalancer.
 - Edit `kube/dnscrypt-init-job.yml`. Change `example.com` to your desired hostname
-and `192.0.2.53` to your static IP.
+  and `192.0.2.53` to your static IP.
 - Edit `kube/dnscrypt-srv.yml` and change `loadBalancerIP` to your static IP.
 - Run `kubectl create -f kube/dnscrypt-init-job.yml` to setup your keys.
 - Run `kubectl create -f kube/dnscrypt-deployment.yml` to deploy the dnscrypt server.
@@ -281,9 +373,9 @@ docker rmi --force jedisct1/dnscrypt-server ||:
 
 - A minimal Ubuntu Linux as a base image.
 - Caching resolver: [Unbound](https://www.unbound.net/), with DNSSEC, prefetching,
-and no logs. The number of threads and memory usage are automatically adjusted.
-Latest stable version, compiled from source. qname minimisation is enabled.
+  and no logs. The number of threads and memory usage are automatically adjusted.
+  Latest stable version, compiled from source. qname minimisation is enabled.
 - [encrypted-dns-server](https://github.com/jedisct1/encrypted-dns-server).
-Compiled from source.
+  Compiled from source.
 
 Keys and certificates are automatically rotated every 8 hour.

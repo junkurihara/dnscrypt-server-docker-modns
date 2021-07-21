@@ -1,13 +1,10 @@
 version: "3"
 services:
   dnscrypt-server:
-    image: jqtype/dnscrypt-server:edge
+    image: jqtype/dnscrypt-server-modns:latest
     container_name: dnscrypt-server
     build:
       context: ./
-      args:
-        - GIT_USER=${GIT_USER}
-        - GIT_TOKEN=${GIT_TOKEN}
     ulimits:
       nofile:
         soft: 90000
@@ -18,8 +15,8 @@ services:
       - ${PORT}:${PORT}/udp
       - ${PORT}:${PORT}/tcp
     expose:
-      - 9100 # for prometheus server working in same private network
-      - 553 # expose unbound port for DoH
+      - 9100 # for prometheus server working in same docker internal network
+      - 553 # expose unbound port
     command: init -A -N ${DOMAIN_NAME} -E '${IPV4_ADDR}:${PORT},[${IPV6_ADDR}]:${PORT}' -M 0.0.0.0:9100
     volumes:
       - ./.env:/opt/encrypted-dns/etc/.env
@@ -28,23 +25,11 @@ services:
       - ./log/dnscrypt-server:/var/log/dnscrypt-server
     # network_mode: "host"
     networks:
-      net-modns: # to directly connect with mdons-proxy
-        ipv4_address: 192.168.53.100
-      net-prometheus:
-
-  # watchtower:
-  #   image: containrrr/watchtower
-  #   container_name: watchtower
-  #   command: dnscrypt-server --interval 30
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
+      net-modns:
 
 networks:
-  net-prometheus:
-    external: true
   net-modns:
     name: net-modns
-    #internal: true
     driver: bridge
     ipam:
       driver: default
