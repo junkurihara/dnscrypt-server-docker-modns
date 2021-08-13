@@ -5,7 +5,7 @@ LABEL maintainer="JK"
 ARG DEBUG
 
 SHELL ["/bin/sh", "-x", "-c"]
-ENV SERIAL 5
+ENV SERIAL 6
 
 ENV CFLAGS=-Ofast
 ENV BUILD_DEPS   curl make build-essential git libevent-dev libexpat1-dev autoconf file libssl-dev byacc
@@ -18,7 +18,7 @@ RUN apt update && apt -qy dist-upgrade && apt -qy clean && \
 RUN update-ca-certificates 2> /dev/null || true
 
 ENV UNBOUND_GIT_URL https://github.com/NLnetLabs/unbound.git
-ENV UNBOUND_GIT_REVISION d300bc8eee547d64c6ab418e2eceaee2ec604c6a
+ENV UNBOUND_GIT_REVISION fdae4cdbbb132296b3b8654a0747d61ddb6b4a25
 
 WORKDIR /tmp
 
@@ -82,6 +82,8 @@ COPY unbound-check.sh /var/svc/unbound/check
 COPY encrypted-dns.sh /var/svc/encrypted-dns/run
 
 COPY watchdog.sh /var/svc/watchdog/run
+
+RUN ln -sf /opt/encrypted-dns/etc/keys/encrypted-dns.toml /opt/encrypted-dns/etc/encrypted-dns.toml
 
 VOLUME ["/opt/encrypted-dns/etc/keys"]
 
