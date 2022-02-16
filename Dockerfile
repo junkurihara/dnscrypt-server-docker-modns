@@ -15,10 +15,10 @@ RUN apt update && apt -qy dist-upgrade && apt -qy clean && \
     apt install -qy --no-install-recommends $RUNTIME_DEPS && \
     rm -fr /tmp/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/* /var/log/apt/* /var/log/*.log
 
-RUN update-ca-certificates 2> /dev/null || true
+	RUN update-ca-certificates 2> /dev/null || true
 
 ENV UNBOUND_GIT_URL https://github.com/NLnetLabs/unbound.git
-ENV UNBOUND_GIT_REVISION 962cb070554af12039638880a4bbefe9afe192e9
+ENV UNBOUND_GIT_REVISION ed4ce7b398b20d0842a048d681d7dcceca0f61fa
 
 WORKDIR /tmp
 
