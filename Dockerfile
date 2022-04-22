@@ -1,4 +1,4 @@
-FROM ubuntu:21.10
+FROM ubuntu:22.04
 LABEL maintainer="Frank Denis"
 LABEL maintainer="JK"
 
@@ -9,7 +9,7 @@ ENV SERIAL 6
 
 ENV CFLAGS=-Ofast
 ENV BUILD_DEPS   curl make build-essential git libevent-dev libexpat1-dev autoconf file libssl-dev byacc
-ENV RUNTIME_DEPS bash util-linux coreutils findutils grep libssl1.1 ldnsutils libevent-2.1-7 expat ca-certificates runit runit-helper jed logrotate
+ENV RUNTIME_DEPS bash util-linux coreutils findutils grep libssl3 ldnsutils libevent-2.1-7 expat ca-certificates runit runit-helper jed logrotate
 
 RUN apt update && apt -qy dist-upgrade && apt -qy clean && \
     apt install -qy --no-install-recommends $RUNTIME_DEPS && \
