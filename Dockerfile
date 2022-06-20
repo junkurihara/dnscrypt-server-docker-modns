@@ -18,7 +18,9 @@ RUN apt update && apt -qy dist-upgrade && apt -qy clean && \
 	RUN update-ca-certificates 2> /dev/null || true
 
 ENV UNBOUND_GIT_URL https://github.com/NLnetLabs/unbound.git
-ENV UNBOUND_GIT_REVISION ed4ce7b398b20d0842a048d681d7dcceca0f61fa
+ENV UNBOUND_GIT_REVISION 233cb5c2189acc0312b54f1a2535468238102ba6
+
+ENV DNSCRYPT_GIT_REVISION 3c7b85e3bc9398ab05195e7a475c5dba8ac20e5e
 
 WORKDIR /tmp
 
@@ -45,6 +47,7 @@ RUN apt update && apt install -qy --no-install-recommends $BUILD_DEPS && \
     git clone https://github.com/junkurihara/encrypted-dns-server-modns encrypted-dns-server && \
     cd encrypted-dns-server && \
     git checkout peeling_header && \
+    git checkout "$DNSCRYPT_GIT_REVISION" &&\
     cargo build --release && \
     # echo "Compiling encrypted-dns version 0.3.23" && \
     # cargo install encrypted-dns && \
