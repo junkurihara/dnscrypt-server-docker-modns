@@ -19,7 +19,7 @@ RUN apt update && apt -qy dist-upgrade && apt -qy clean && \
 
 ENV UNBOUND_GIT_URL https://github.com/NLnetLabs/unbound.git
 ENV UNBOUND_GIT_REVISION e11d206a825349ca447ee27b35aeee4f00271483
-ENV DNSCRYPT_GIT_REVISION 539c23d0034634aa9ae4140752338ac3042c3a0c
+ENV DNSCRYPT_GIT_REVISION 94611e8efbda5a947f2f02db87f93eb187161a98
 
 WORKDIR /tmp
 
